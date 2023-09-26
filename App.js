@@ -4,13 +4,13 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import Constants from "expo-constants";
 import AWS from "aws-sdk";
 
-// const { ACCESS_KEY, SECRET_ACCESS_KEY } = Constants.manifest.extra;
+const { ACCESS_KEY, SECRET_ACCESS_KEY } = Constants.manifest.extra;
 
-// AWS.config.update({
-//   region: "us-east-1",
-//   accessKeyId: ACCESS_KEY,
-//   secretAccessKey: SECRET_ACCESS_KEY,
-// });
+AWS.config.update({
+  region: "us-east-1",
+  accessKeyId: ACCESS_KEY,
+  secretAccessKey: SECRET_ACCESS_KEY,
+});
 
 export default function App() {
 
