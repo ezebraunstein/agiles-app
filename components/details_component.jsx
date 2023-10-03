@@ -1,18 +1,79 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import Vector from '../assets/vectors/flecha.svg';
-import IcBaselineSearch from '../assets/vectors/lupa.svg';
+import React, { Component } from 'react';
+import { StyleSheet, Animated, View, Text, Button } from 'react-native';
+import { Flecha } from '../icons/flechaIcon'
 
-export const Details = () => {
+
+class AnimationComponent extends Component{
+  constructor() {
+    super();
+    this.state = {
+      translateY: new Animated.Value(1000),
+    };
+  }
+
+  componentDidMount() {
+    Animated.timing(
+      this.state.translateY,
+      {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }
+    ).start();
+  }
+  
+  componentWillUnmount() {
+    Animated.timing(
+      this.state.translateY,
+      {
+        toValue: 1000, 
+        duration: 1000,
+        useNativeDriver: true,
+      }
+    ).start();
+  }
+
+
+  render() {
+    const { translateY } = this.state;
+    return (
+      <Animated.View
+        style={{
+          transform: [{ translateY: translateY }],
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '50%', // Ocupa la mitad de la pantalla
+        }}
+      >
+        <Details hasProduct={this.props.hasProduct} setHasProduct={this.props.setHasProduct} setScanned={this.props.setScanned}/>
+      </Animated.View>
+    );
+  }
+}
+
+export default AnimationComponent;
+
+
+export function Details({hasProduct, setHasProduct, setScanned}) {
+  handleClick = () =>{
+    console.log(hasProduct)
+    setHasProduct(null);
+    setScanned(false);
+  }
   return (
     <View style={styles.root}>
-      <View style={styles.formkitDown}>
+      <View style={styles.formkitDown} onTouchEnd={handleClick}>
+        <Flecha/>
       </View>
       <View style={styles.frame14}>
-        <Text style={styles.productoLoremIpsum}>Producto : Lorem Ipsum</Text>
-        <Text style={styles.marcaLoremIpsum}>Marca : Lorem Ipsum</Text>
-        <Text style={styles.barcodeXxxxxxxx}>Barcode : XXXXXXXX</Text>
-        <Text style={styles.tipoLoremIpsum}>Tipo : Lorem Ipsum</Text>
+        <Text style={styles.productoLoremIpsum}>Producto : {hasProduct.Nombre}</Text>
+        <Text style={styles.marcaLoremIpsum}>Marca : {hasProduct.Marca}</Text>
+        <Text style={styles.barcodeXxxxxxxx}>Barcode : {hasProduct.Id}</Text>
+        <Text style={styles.tipoLoremIpsum}>Tipo : {hasProduct.Tipo}</Text>
+        <Text style={styles.tipoLoremIpsum}>Apto : {hasProduct.Apto}</Text>
+        
       </View>
       <View style={styles.frame15}>
         <View style={styles.frame16}>
@@ -25,7 +86,7 @@ export const Details = () => {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1, // Use flex: 1 to fill the available space
+    flex: 1, 
     backgroundColor: '#FFF',
   },
   formkitDown: {
@@ -38,25 +99,25 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 20,
     fontWeight: '400',
-    lineHeight: 27, // Adjust line height as needed
+    lineHeight: 27, 
   },
   marcaLoremIpsum: {
     color: '#000',
     fontSize: 20,
     fontWeight: '400',
-    lineHeight: 27, // Adjust line height as needed
+    lineHeight: 27, 
   },
   barcodeXxxxxxxx: {
     color: '#000',
     fontSize: 20,
     fontWeight: '400',
-    lineHeight: 27, // Adjust line height as needed
+    lineHeight: 27, 
   },
   tipoLoremIpsum: {
     color: '#000',
     fontSize: 20,
     fontWeight: '400',
-    lineHeight: 27, // Adjust line height as needed
+    lineHeight: 27, 
   },
   frame14: {
     flexDirection: 'column',
@@ -81,6 +142,6 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 22,
     fontWeight: '600',
-    lineHeight: 29, // Adjust line height as needed
+    lineHeight: 29, 
   },
 });
