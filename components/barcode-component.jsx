@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Button, StyleSheet } from "react-native";
+import { Text, View, Button, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import AnimationComponent from "./details-component";
 
 
 export const Barcode = () => {
@@ -14,7 +15,11 @@ export const Barcode = () => {
     setText(data);
     console.log("Type: " + type + "\nData: " + data);
     try {
-      const items = [{ Id: '77980229', tacc: 'true' }, { Id: '77995681', tacc: 'true' }, { Id: '77969071', tacc: 'false' }, { Id: '7798101201909', tacc: 'false' }];
+      const items = [{ Id: '77980229', tacc: 'true' }, 
+      { Id: '77995681', tacc: 'true' }, 
+      { Id: '77969071', tacc: 'false' }, 
+      { Id: '7798101201909', tacc: 'false' },
+      { Id: '036000291452', tacc: 'false' }];
       const itemEncontrado = items.find(item => item.Id == data);
       if (itemEncontrado) {
         console.log("Scan succeeded. Data:", items);
@@ -32,21 +37,19 @@ export const Barcode = () => {
     }
   };
 
+  const onPressOutside = () => {
+    setHasProduct(null)
+    setScanned(false)
+  };
+
+
   const ResultOverlay = () => {
     if (!showResult) return null;
 
     let backgroundColor, icon, text;
 
     if (hasProduct) {
-      if (hasProduct.tacc === 'true') {
-        backgroundColor = "rgba(255, 0, 0, 0.7)";
-        icon = "✕";
-        text = "Contiene Gluten";
-      } else {
-        backgroundColor = "rgba(0, 255, 0, 0.7)";
-        icon = "✓";
-        text = "Libre de Gluten";
-      }
+      return <AnimationComponent hasProduct={hasProduct} setHasProduct={setHasProduct} setScanned={setScanned} />        
     } else {
       backgroundColor = "rgba(255, 255, 0, 0.7)";
       text = "No reconocido";
@@ -64,13 +67,15 @@ export const Barcode = () => {
 
 
   return (
-    <View style={styles.barcodebox}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={{ height: '100%', width: '100%' }}
-      />
-      <ResultOverlay />
-    </View>
+    <TouchableWithoutFeedback onPress={onPressOutside}>
+      <View style={styles.barcodebox}>
+          <BarCodeScanner
+              onBarCodeScanned={ scanned ? undefined : handleBarCodeScanned}
+              style={{ height: '100%', width: '100%' }}
+              />
+          <ResultOverlay/>
+      </View>
+    </TouchableWithoutFeedback>
   )
 }
 
