@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
+import Constants from "expo-constants";
+import AWS from "aws-sdk";
 import { Text, View, Button, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AnimationComponent from "./details-component";
 
-const { ACCESS_KEY, SECRET_ACCESS_KEY } = Constants.extra;
+const { REACT_APP_ACCESS_KEY, REACT_APP_SECRET_ACCESS_KEY } = Constants.expoConfig.extra;
 
 AWS.config.update({
   region: "us-east-1",
-  accessKeyId: ACCESS_KEY,
-  secretAccessKey: SECRET_ACCESS_KEY,
+  accessKeyId: REACT_APP_ACCESS_KEY,
+  secretAccessKey: REACT_APP_SECRET_ACCESS_KEY,
 });
 
 export const Barcode = () => {

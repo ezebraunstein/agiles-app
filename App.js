@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Button } from "react-native";
 import { Barcode } from "./components/barcode-component";
-import Constants from "expo-constants";
-import AWS from "aws-sdk";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { Details } from "./components/details-component";
 
