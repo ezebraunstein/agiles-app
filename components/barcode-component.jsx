@@ -6,40 +6,40 @@ import AnimationComponent from "./details-component";
 
 export const Barcode = () => {
   const [scanned, setScanned] = useState(false);
-  const [text, setText] = useState("");
   const [hasProduct, setHasProduct] = useState(null);
   const [showResult, setShowResult] = useState(false);
 
   const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
-    setText(data);
     console.log("Type: " + type + "\nData: " + data);
     try {
-      const items = [{ Id: '77980229', tacc: 'true' }, 
-      { Id: '77995681', tacc: 'true' }, 
-      { Id: '77969071', tacc: 'false' }, 
-      { Id: '7798101201909', tacc: 'false' },
-      { Id: '036000291452', tacc: 'false' }];
+      const items = [{ Id: '77980229',Nombre:"" ,Marca:"",Tipo:"" ,Apto: 'true' }, 
+      { Id: '77995681',Nombre:"" ,Marca:"",Tipo:"" ,Apto: 'true' }, 
+      { Id: '77969071',Nombre:"" ,Marca:"",Tipo:"" ,Apto: 'false' }, 
+      { Id: '7798101201909',Nombre:"" ,Marca:"",Tipo:"" ,Apto: 'false' },
+      { Id: '036000291452',Nombre:"" ,Marca:"",Tipo:"" ,Apto: 'false' }];
       const itemEncontrado = items.find(item => item.Id == data);
       if (itemEncontrado) {
-        console.log("Scan succeeded. Data:", items);
+        console.log("Scan succeeded. Data:", itemEncontrado);
         setHasProduct(itemEncontrado);
       }
 
       setShowResult(true);
       setTimeout(() => {
-        setScanned(false);
-        setHasProduct(null);
-        setShowResult(false);
-      }, 1000);
+        if(!itemEncontrado) {
+          setShowResult(false);
+          setScanned(false);
+        }
+      }, 1500);
     } catch (err) {
       console.error("Error fetching information:", err);
     }
   };
-
+  
   const onPressOutside = () => {
-    setHasProduct(null)
-    setScanned(false)
+    setScanned(false);
+    setHasProduct(null);
+    setShowResult(false);
   };
 
 
@@ -49,9 +49,9 @@ export const Barcode = () => {
     let backgroundColor, icon, text;
 
     if (hasProduct) {
-      return <AnimationComponent hasProduct={hasProduct} setHasProduct={setHasProduct} setScanned={setScanned} />        
+      return <AnimationComponent hasProduct={hasProduct} setShowResult={setShowResult} setScanned={setScanned} />        
     } else {
-      backgroundColor = "rgba(255, 255, 0, 0.7)";
+      backgroundColor = "rgba(255, 255, 0, 0.6)";
       text = "No reconocido";
     }
 
@@ -67,15 +67,15 @@ export const Barcode = () => {
 
 
   return (
-    <TouchableWithoutFeedback onPress={onPressOutside}>
-      <View style={styles.barcodebox}>
+    <View style={styles.barcodebox}>
+      <TouchableWithoutFeedback onPress={onPressOutside}>
           <BarCodeScanner
               onBarCodeScanned={ scanned ? undefined : handleBarCodeScanned}
               style={{ height: '100%', width: '100%' }}
               />
+      </TouchableWithoutFeedback>
           <ResultOverlay/>
       </View>
-    </TouchableWithoutFeedback>
   )
 }
 
