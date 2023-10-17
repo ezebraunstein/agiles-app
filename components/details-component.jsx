@@ -3,7 +3,7 @@ import { StyleSheet, Animated, View, Text, Button } from 'react-native';
 import { Flecha } from '../icons/flechaIcon'
 import { Lupa } from '../icons/lupaIcon'
 
-export default function AnimationComponent({ hasProduct, setShowResult, setScanned }) {
+export default function AnimationComponent({ hasProduct, hasTacc, setShowResult, setScanned }) {
   const translateY = useRef(new Animated.Value(1000)).current;
 
   useEffect(() => {
@@ -40,6 +40,7 @@ export default function AnimationComponent({ hasProduct, setShowResult, setScann
       hasProduct={hasProduct}
       setShowResult={setShowResult}
       setScanned={setScanned}
+      hasTacc={hasTacc}
       />
     </Animated.View>
   );
@@ -47,7 +48,7 @@ export default function AnimationComponent({ hasProduct, setShowResult, setScann
 
 
 
-export function Details ({hasProduct, setShowResult, setScanned}) {
+export function Details ({hasProduct, hasTacc, setShowResult, setScanned}) {
   
   handleClick = () =>{
     setShowResult(false);
@@ -60,11 +61,11 @@ export function Details ({hasProduct, setShowResult, setScanned}) {
         <Flecha/>
       </View>
       <View style={styles.frame14}>
-        <Text style={styles.texto}>Producto : {hasProduct.Nombre}</Text>
-        <Text style={styles.texto}>Marca : {hasProduct.Marca}</Text>
-        <Text style={styles.texto}>Barcode : {hasProduct.Id}</Text>
-        <Text style={styles.texto}>Tipo : {hasProduct.Tipo}</Text>
-        <Text style={styles.texto}>Apto : {hasProduct.Apto}</Text>
+        <Text style={styles.texto}>Producto : {hasProduct.name}</Text>
+        <Text style={styles.texto}>Marca : {hasProduct.brand}</Text>
+        <Text style={styles.texto}>Barcode : {hasProduct.code}</Text>
+        <Text style={styles.texto}>Categoría : {hasProduct.category}</Text>
+        <Text style={styles.texto}>Apto : {hasTacc ==  true ? "NO" : "SI"}</Text>
       </View>
       <View style={styles.frame15}>
         <View style={styles.frame16}>
