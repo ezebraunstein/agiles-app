@@ -17,9 +17,7 @@ export const Barcode = () => {
 
   const docClient = new AWS.DynamoDB.DocumentClient();
   const [scanned, setScanned] = useState(false);
-  const [text, setText] = useState("");
   const [tacc, setTacc] = useState(false);
-  const [productData, setProductData] = useState(null);
   const [hasProduct, setHasProduct] = useState(null);
   const [showResult, setShowResult] = useState(false);
 
@@ -51,7 +49,6 @@ export const Barcode = () => {
 
     setScanned(true);
     setHasProduct(null);
-    setText(data);
 
     console.log("Type: " + type + "\nData: " + data);
 
@@ -66,13 +63,6 @@ export const Barcode = () => {
           setTacc(false);
         }
 
-        // setProductData({
-        //   name: items.Items[0].name,
-        //   brand: items.Items[0].brand,
-        //   category: items.Items[0].category,
-        //   code: items.Items[0].code
-        // });
-
         setHasProduct({
           name: items.Items[0].name,
           brand: items.Items[0].brand,
@@ -82,17 +72,11 @@ export const Barcode = () => {
 
       }
 
-      // const itemEncontrado = items.find(item => item.Id == data);
-      // if (itemEncontrado) {
-      //   console.log("Scan succeeded. Data:", itemEncontrado);
-      //   setHasProduct(itemEncontrado);
-      // }
-
       setShowResult(true);
       setTimeout(() => {
-        if (!hasProduct) {
-          setShowResult(false);
+        if (hasProduct === null) {
           setScanned(false);
+          setShowResult(false);
         }
       }, 1500);
     } catch (err) {
@@ -112,18 +96,32 @@ export const Barcode = () => {
     let backgroundColor, icon, text;
 
     if (hasProduct) {
-      return <AnimationComponent hasProduct={hasProduct} hasTacc={tacc} setShowResult={setShowResult} setScanned={setScanned} />
+      if (tacc === true) {
+        backgroundColor = "rgba(255, 0, 0, 0.7)";
+        icon = "✕";
+        text = "Contiene Gluten";
+      } else {
+        backgroundColor = "rgba(0, 255, 0, 0.7)";
+        icon = "✓";
+        text = "Libre de Gluten";
+      }
+      return (
+        <View style={[styles.overlay, { backgroundColor }]}>
+          {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
+          <Text style={styles.overlayText}>{text}</Text>
+          <AnimationComponent hasProduct={hasProduct} hasTacc={tacc} setShowResult={setShowResult} setScanned={setScanned} />
+        </View>
+      );
     } else {
       backgroundColor = "rgba(255, 255, 0, 0.6)";
       text = "No reconocido";
+      return (
+        <View style={[styles.overlay, { backgroundColor }]}>
+          {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
+          <Text style={styles.overlayText}>{text}</Text>
+        </View>
+      );
     }
-
-    return (
-      <View style={[styles.overlay, { backgroundColor }]}>
-        {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
-        <Text style={styles.overlayText}>{text}</Text>
-      </View>
-    );
   };
 
   return (
