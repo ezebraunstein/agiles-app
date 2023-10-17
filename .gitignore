@@ -34,6 +34,13 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+
+node_modules
+amplify/
+.env
+aws
+.vscode
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
@@ -55,9 +62,3 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
-
-node_modules
-amplify/
-.env
-aws
-.vscode
