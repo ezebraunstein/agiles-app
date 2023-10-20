@@ -25,8 +25,8 @@ const App = () => {
   useEffect(() => {
     askForCameraPermission();
   }, []);
-  
 
+  
   return (
     <View style={styles.barcodebox}>
       <Pressable onPress={signOut} style={styles.buttonContainer}>
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     top: 100,
     left: 100,
+    zIndex: 1,
   },
   buttonText: {color: 'white', padding: 16, fontSize: 18},
 });
