@@ -2,32 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Animated, View, Text, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { OtherProduct } from './other-product-component';
+import AWS from "aws-sdk";
 
 
 export default function AnimationComponent({ hasProduct, hasTacc, setShowResult, setScanned }) {
   const translateY = useRef(new Animated.Value(1000)).current;
   const [height, setHeight] = useState('50%')
-  
-  const product = [{
-    name: 'Pure 100%',
-    brand: 'Tomattino',
-    code: '123456789',  
-    category: 'Pure',
-  },
-  {
-    name: 'Digamosle Pure',
-    brand: 'Zapallo',
-    code: '223456789',  
-    category: 'Pure',
-  },
-  {
-    name: 'No se me ocurre nada',
-    brand: 'Tomate',
-    code: '22345679',  
-    category: 'Pure',
-  }];
-  const [arrayProducts, setArrayProducts] = useState(product);
+  const docClient = new AWS.DynamoDB.DocumentClient();
 
+  const [arrayProducts, setArrayProducts] = useState([]);
+
+  const fetchProductsInformation = async () => {
+    return new Promise((resolve, reject) => {
+      const params = {
+        TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
+        FilterExpression: "category = :category AND hasTacc = :hasTacc AND NOT code = :code",
+        ExpressionAttributeValues: {
+          ":category": hasProduct.category,
+          ":hasTacc": false,
+          ":code": hasProduct.code,
+        },
+      };
+
+      docClient.scan(params, (err, items) => {
+        if (err) {
+          console.error(
+            "Unable to scan the table. Error JSON:",
+            JSON.stringify(err, null, 2)
+          );
+          reject(err);
+        } else {
+          resolve(items);
+        }
+      });
+    });
+  };
 
   useEffect(() => {
     const animationIn = Animated.timing(translateY, {
@@ -52,9 +61,11 @@ export default function AnimationComponent({ hasProduct, hasTacc, setShowResult,
     setScanned(false)
   }
 
-  function showOtherProducts () {
+  async function showOtherProducts () {
     setHeight('80%')
     translateY.setValue(250)
+    const products = await fetchProductsInformation();
+    setArrayProducts(products.Items)
     Animated.timing(translateY, {
       toValue: 0,
       duration: 1000,
