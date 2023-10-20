@@ -74,7 +74,7 @@ export const Barcode = () => {
 
       setShowResult(true);
       setTimeout(() => {
-        if (hasProduct === null) {
+        if (!items.Items[0]) {
           setScanned(false);
           setShowResult(false);
         }
@@ -82,12 +82,6 @@ export const Barcode = () => {
     } catch (err) {
       console.error("Error fetching information:", err);
     }
-  };
-
-  const onPressOutside = () => {
-    setScanned(false);
-    setHasProduct(null);
-    setShowResult(false);
   };
 
   const ResultOverlay = () => {
@@ -126,12 +120,10 @@ export const Barcode = () => {
 
   return (
     <View style={styles.barcodebox}>
-      <TouchableWithoutFeedback onPress={onPressOutside}>
         <BarCodeScanner
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={{ height: '100%', width: '100%' }}
         />
-      </TouchableWithoutFeedback>
       <ResultOverlay />
     </View>
   )
