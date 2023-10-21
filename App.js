@@ -26,7 +26,7 @@ const App = () => {
     askForCameraPermission();
   }, []);
 
-  
+
   return (
     <View style={styles.barcodebox}>
       <Pressable onPress={signOut} style={styles.buttonContainer}>
@@ -47,13 +47,15 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignSelf: 'center',
-    backgroundColor: 'black',
+    backgroundColor: 'red',
     paddingHorizontal: 8,
-    top: 100,
-    left: 100,
+    position: 'absolute',
+    borderRadius: 10,
+    top: '6%',
+    right: '5%',
     zIndex: 1,
   },
-  buttonText: {color: 'white', padding: 16, fontSize: 18},
+  buttonText: { color: 'white', padding: 15, fontSize: 18 },
 });
 
-export default withAuthenticator (App);
+export default withAuthenticator(App);
