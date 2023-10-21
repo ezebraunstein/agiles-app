@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Constants from "expo-constants";
 import AWS from "aws-sdk";
-import { Text, View, Button, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { Text, View, Button, StyleSheet, TouchableWithoutFeedback, Pressable, Animated } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AnimationComponent from "./details-component";
 
@@ -85,6 +85,17 @@ export const Barcode = () => {
   };
 
   const ResultOverlay = () => {
+    const translateY = useRef(new Animated.Value(300)).current;
+    useEffect(() => {
+      const animationIn = Animated.timing(translateY, {
+        toValue: 150,
+        duration: 600,
+        useNativeDriver: true,
+      });
+      setTimeout(() => {
+        animationIn.start();
+      }, 500);
+    }, [translateY]);
     if (!showResult) return null;
 
     let backgroundColor, icon, text;
@@ -101,8 +112,14 @@ export const Barcode = () => {
       }
       return (
         <View style={[styles.overlay, { backgroundColor }]}>
-          {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
-          <Text style={styles.overlayText}>{text}</Text>
+          <Animated.View style={{ 
+            transform: [{ translateY }],
+            height: '100%', 
+            width: '100%' 
+            }}>
+            {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
+            <Text style={styles.overlayText}>{text}</Text>
+          </Animated.View>
           <AnimationComponent hasProduct={hasProduct} hasTacc={tacc} setShowResult={setShowResult} setScanned={setScanned} />
         </View>
       );
@@ -147,6 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 80,
     fontWeight: "bold",
     color: "#fff",
+    textAlign: "center",
   },
   overlayText: {
     fontSize: 50,
