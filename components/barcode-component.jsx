@@ -4,6 +4,8 @@ import AWS from "aws-sdk";
 import { Text, View, Button, StyleSheet, TouchableWithoutFeedback, Pressable, Animated } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AnimationComponent from "./details-component";
+import { MenuProfile } from "./profile-component";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const { REACT_APP_ACCESS_KEY, REACT_APP_SECRET_ACCESS_KEY } = Constants.expoConfig.extra;
 
@@ -20,6 +22,7 @@ export const Barcode = () => {
   const [tacc, setTacc] = useState(false);
   const [hasProduct, setHasProduct] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const fetchProductInformation = async (code) => {
     return new Promise((resolve, reject) => {
@@ -84,6 +87,10 @@ export const Barcode = () => {
     }
   };
 
+  const handleAbrirMenu = () => {
+    setShowMenu(!showMenu)
+  }
+
   const ResultOverlay = () => {
     const translateY = useRef(new Animated.Value(300)).current;
     useEffect(() => {
@@ -137,10 +144,12 @@ export const Barcode = () => {
 
   return (
     <View style={styles.barcodebox}>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={{ height: '100%', width: '100%' }}
-        />
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={{ height: '100%', width: '100%' }}
+      />
+      <FontAwesome5 name="bars" size={40}  onPress={handleAbrirMenu} style={styles.buttonContainer}/>
+      {showMenu && <MenuProfile setShowMenu={setShowMenu} />}
       <ResultOverlay />
     </View>
   )
@@ -171,5 +180,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
+  },
+  buttonContainer: {
+    alignSelf: 'center',
+    color: 'black',
+    position: 'absolute',
+    backgroundColor: '#fff',
+    top: 80,
+    right: 30
   },
 })
