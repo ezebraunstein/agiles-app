@@ -88,7 +88,7 @@ export const Barcode = () => {
   };
 
   const handleAbrirMenu = () => {
-    setShowMenu(!showMenu)
+    setShowMenu(true)
   }
 
   const ResultOverlay = () => {
@@ -148,7 +148,7 @@ export const Barcode = () => {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={{ height: '100%', width: '100%' }}
       />
-      <FontAwesome5 name="bars" size={40}  onPress={handleAbrirMenu} style={styles.buttonContainer}/>
+      <FontAwesome5 name="bars" size={35}  onPress={handleAbrirMenu} style={styles.buttonContainer}/>
       {showMenu && <MenuProfile setShowMenu={setShowMenu} />}
       <ResultOverlay />
     </View>

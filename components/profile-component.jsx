@@ -1,15 +1,21 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Animated } from 'react-native';
+import { StyleSheet, View, Text, Animated, TouchableWithoutFeedback } from 'react-native';
 /* import { EditButton } from '../../components/EditButton';*/
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react-native';
+import { DropdownComponent } from './dropdown-component';
+
+
+const userSelector = (context) => [context.user]
 
 export const MenuProfile = ({setShowMenu}) => {
-    const translateX = useRef(new Animated.Value(1000)).current;
+    const translateX = useRef(new Animated.Value(200)).current;
+    const { user, signOut } = useAuthenticator(userSelector);
 
     useEffect(() => {
         const animationIn = Animated.timing(translateX, {
           toValue: 0,
-          duration: 1000,
+          duration: 500,
           useNativeDriver: true,
         });
         animationIn.start();
@@ -18,8 +24,8 @@ export const MenuProfile = ({setShowMenu}) => {
     
     function handleCloseMenu() {
         Animated.timing(translateX, {
-            toValue: 1000,
-            duration: 1000,
+            toValue: 200,
+            duration: 500,
             useNativeDriver: true,
         }).start(close);
     }
@@ -42,28 +48,29 @@ export const MenuProfile = ({setShowMenu}) => {
             <View style={styles.root}>
                 <View style={styles.topMenu}>
                     <FontAwesome5 name="times" size={28} onPress={handleCloseMenu} />
-                    {/* <Group3 />  Aca iria la imagen */}
+                    {/* Aca iria la imagen */}
                     <View style={styles.frame11}>
                         <Text style={styles.$name}>
                             Eze Braunstein
                         </Text>
+                        <DropdownComponent/>
                     </View>
                 </View>
-                {/* <EditButton buttonLabel={`Edit Profile`} /> */}
+                {/* Aca el editar perfil */}
                 <View style={styles.column}>
                     <View style={styles.navItem}>
                         <View style={styles.row}>
                             <View style={styles.FontAwesome5s}>
                             </View>
-                            <Text style={styles.text1}>
+                            <Text style={styles.text}>
                                 Add Products
                             </Text>
                                 <FontAwesome5 name="plus" size={20} />
                         </View>
                     </View>
-                    <View>
+                    <View style={styles.navItem}>
                         <View style={styles.row}>
-                            <Text style={styles.text1}>
+                            <Text style={styles.text}>
                                 History
                             </Text>
                             <View>
@@ -76,14 +83,16 @@ export const MenuProfile = ({setShowMenu}) => {
                 <View>
                 </View>
                 {/*  linea separadora */}
-                <View style={styles.navItem}>
-                    <View style={styles.frame3}>
-                    <FontAwesome5 name="sign-out-alt" size={20} solid/>                        
-                        <Text style={styles.text}>
-                            Log Out
-                        </Text>
+                <TouchableWithoutFeedback onPress={signOut} >
+                    <View style={styles.navItem}>
+                        <View style={styles.frame3}>
+                        <FontAwesome5 name="sign-out-alt" size={20} solid/>                        
+                            <Text style={styles.text}>
+                                Log Out
+                            </Text>
+                        </View>
                     </View>
-                </View>
+                </TouchableWithoutFeedback>
             </View>
         </Animated.View>
     );
@@ -126,16 +135,6 @@ const styles = StyleSheet.create({
         gap: 1,
     },
     text: {
-        flexGrow: 1,
-        flexShrink: 0,
-        flexBasis: 0,
-        color: '#000',
-        fontSize: 16,
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: 29,
-    },
-    text1: {
         color: '#000',
         fontSize: 20,
         fontStyle: 'normal',
@@ -143,8 +142,8 @@ const styles = StyleSheet.create({
         lineHeight: 29,
     },
     navItem: {
-        alignItems: 'center',
         flexDirection: 'row',
+        height: 65,
     },
     frame3: {
         alignItems: 'center',
@@ -156,8 +155,10 @@ const styles = StyleSheet.create({
     },
     row:{
         flexDirection: 'row',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         gap: 10,
+        width: '100%',
     },
     column :{
         flexDirection: 'column',
