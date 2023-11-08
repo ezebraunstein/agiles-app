@@ -29,9 +29,9 @@ const App = () => {
 
   return (
     <View style={styles.barcodebox}>
-      <Pressable onPress={signOut} style={styles.buttonContainer}>
+      {/* <Pressable onPress={signOut} style={styles.buttonContainer}>
         <Text style={styles.buttonText}>Sign out!</Text>
-      </Pressable>
+      </Pressable> */}
       <Barcode />
     </View>
   );
