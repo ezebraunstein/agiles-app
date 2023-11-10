@@ -3,25 +3,53 @@ import { StyleSheet, Animated, View, Text, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { OtherProduct } from './other-product-component';
 import AWS from "aws-sdk";
+import { useFilter } from './context';
 
 
-export default function AnimationComponent({ hasProduct, hasTacc, setShowResult, setScanned }) {
+export default function AnimationComponent({ hasProduct, setShowResult, setScanned }) {
   const translateY = useRef(new Animated.Value(1000)).current;
   const [height, setHeight] = useState('50%')
   const docClient = new AWS.DynamoDB.DocumentClient();
+  const { selectedFilter } = useFilter();
 
   const [arrayProducts, setArrayProducts] = useState([]);
 
   const fetchProductsInformation = async () => {
     return new Promise((resolve, reject) => {
+      // const params = {
+      //   TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
+      //   FilterExpression: "category = :category AND hasTacc = :hasTacc AND NOT code = :code",
+      //   ExpressionAttributeValues: {
+      //     ":category": hasProduct.category,
+      //     ":hasTacc": false,
+      //     ":code": hasProduct.code,
+      //   },
+      // };
+      let filterExpression = "category = :category AND NOT code = :code";
+      let expressionAttributeValues = {
+        ":category": hasProduct.category,
+        ":code": hasProduct.code,
+      };
+
+      switch (selectedFilter) {
+        case '1': // TACC
+          filterExpression += " AND hasTacc = :hasTacc";
+          expressionAttributeValues[":hasTacc"] = false;
+          break;
+        case '2': // Vegan
+          filterExpression += " AND hasVegan = :hasVegan";
+          expressionAttributeValues[":hasVegan"] = false;
+          break;
+        case '3': // Lactose-Free
+          filterExpression += " AND hasLactose = :hasLactose";
+          expressionAttributeValues[":hasLactose"] = false;
+          break;
+      }
+
       const params = {
         TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
-        FilterExpression: "category = :category AND hasTacc = :hasTacc AND NOT code = :code",
-        ExpressionAttributeValues: {
-          ":category": hasProduct.category,
-          ":hasTacc": false,
-          ":code": hasProduct.code,
-        },
+        FilterExpression: filterExpression,
+        ExpressionAttributeValues: expressionAttributeValues,
       };
 
       docClient.scan(params, (err, items) => {
@@ -47,7 +75,7 @@ export default function AnimationComponent({ hasProduct, hasTacc, setShowResult,
     animationIn.start();
 
   }, [translateY]);
-  
+
   function closeTab() {
     Animated.timing(translateY, {
       toValue: 1000,
@@ -61,7 +89,7 @@ export default function AnimationComponent({ hasProduct, hasTacc, setShowResult,
     setScanned(false)
   }
 
-  async function showOtherProducts () {
+  async function showOtherProducts() {
     setHeight('80%')
     translateY.setValue(250)
     const products = await fetchProductsInformation();
@@ -85,11 +113,13 @@ export default function AnimationComponent({ hasProduct, hasTacc, setShowResult,
       }}
     >
       <Details
-      hasProduct={hasProduct}
-      closeTab={closeTab}
-      hasTacc={hasTacc}
-      showOtherProducts = {showOtherProducts}
-      arrayProducts = {arrayProducts}
+        hasProduct={hasProduct}
+        closeTab={closeTab}
+        // hasTacc={hasTacc}
+        isProductApt={hasProduct.isProductApt}
+        selectedFilter={selectedFilter}
+        showOtherProducts={showOtherProducts}
+        arrayProducts={arrayProducts}
       />
     </Animated.View>
   );
@@ -97,14 +127,14 @@ export default function AnimationComponent({ hasProduct, hasTacc, setShowResult,
 
 
 
-export function Details ({hasProduct, hasTacc, closeTab, showOtherProducts, arrayProducts}) {
+export function Details({ hasProduct, isProductApt, selectedFilter, closeTab, showOtherProducts, arrayProducts }) {
   const translateY = useRef(new Animated.Value(1000)).current;
   let [showMoreProducts, setshowMoreProducts] = useState(false)
-  handleClick = () =>{
+  handleClick = () => {
     closeTab()
   }
 
-  function handleOpenMoreProducts () {
+  function handleOpenMoreProducts() {
     showOtherProducts();
     setshowMoreProducts(true)
     Animated.timing(translateY, {
@@ -113,7 +143,22 @@ export function Details ({hasProduct, hasTacc, closeTab, showOtherProducts, arra
       useNativeDriver: true,
     }).start();
   }
-  
+
+  let aptoText = '';
+  switch (selectedFilter) {
+    case '1': // TACC
+      aptoText = isProductApt ? "Libre de Gluten" : "Contiene Gluten";
+      break;
+    case '2': // Vegan
+      aptoText = isProductApt ? "Apto Vegano" : "No Apto Vegano";
+      break;
+    case '3': // Lactose-Free
+      aptoText = isProductApt ? "Libre de Lactosa" : "Contiene Lactosa";
+      break;
+    default:
+      aptoText = "Información no disponible";
+  }
+
   return (
     <View style={styles.root}>
       <View style={styles.formkitDown} onTouchEnd={handleClick}>
@@ -124,41 +169,41 @@ export function Details ({hasProduct, hasTacc, closeTab, showOtherProducts, arra
         <Text style={styles.texto}>Marca : {hasProduct.brand}</Text>
         <Text style={styles.texto}>Barcode : {hasProduct.code}</Text>
         <Text style={styles.texto}>Categoría : {hasProduct.category}</Text>
-        <Text style={styles.texto}>Apto : {hasTacc ? "NO" : "SI"}</Text>
+        <Text style={styles.texto}>Apto : {aptoText}</Text>
       </View>
       {!showMoreProducts ?
-      <View style={styles.frame15} onTouchEnd={handleOpenMoreProducts}>
-        <View style={styles.frame16}>
-          <Icon name="search" size={20} />
-          <Text style={styles.buscarProductosAptos} >{hasTacc ? 'Buscar productos aptos' : 'Buscar productos similares'}</Text>
-        </View> 
-      </View>
-      :  
+        <View style={styles.frame15} onTouchEnd={handleOpenMoreProducts}>
+          <View style={styles.frame16}>
+            <Icon name="search" size={20} />
+            <Text style={styles.buscarProductosAptos} >{'Buscar productos aptos'}</Text>
+          </View>
+        </View>
+        :
         <Animated.View
-        style={{
-          transform: [{ translateY }],
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '65%',
-        }}
+          style={{
+            transform: [{ translateY }],
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '65%',
+          }}
         >
-          <View style = {styles.frame14}>
-            <Text style ={styles.texto} >Productos aptos similares:</Text>
+          <View style={styles.frame14}>
+            <Text style={styles.texto} >Productos aptos similares:</Text>
             {arrayProducts.map((product) => (
               <OtherProduct key={product.code} data={product} />
             ))}
           </View>
-      </Animated.View>
-        }
+        </Animated.View>
+      }
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1, 
+    flex: 1,
     backgroundColor: '#FFF',
   },
   formkitDown: {
@@ -171,7 +216,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 20,
     fontWeight: '500',
-    lineHeight: 27, 
+    lineHeight: 27,
   },
   frame14: {
     flexDirection: 'column',
@@ -180,10 +225,10 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   frame15: {
-    flex:2,
+    flex: 2,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingVertical:50
+    paddingVertical: 50
   },
   frame16: {
     flexDirection: 'row',
@@ -194,12 +239,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    gap:10
+    gap: 10
   },
   buscarProductosAptos: {
     color: '#000',
     fontSize: 22,
     fontWeight: '600',
-    lineHeight: 29, 
+    lineHeight: 29,
   },
 });

@@ -6,6 +6,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import AnimationComponent from "./details-component";
 import { MenuProfile } from "./profile-component";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useFilter } from './context';
 
 const { REACT_APP_ACCESS_KEY, REACT_APP_SECRET_ACCESS_KEY } = Constants.expoConfig.extra;
 
@@ -23,6 +24,7 @@ export const Barcode = () => {
   const [hasProduct, setHasProduct] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const { selectedFilter } = useFilter();
 
   const fetchProductInformation = async (code) => {
     return new Promise((resolve, reject) => {
@@ -59,20 +61,45 @@ export const Barcode = () => {
 
       const items = await fetchProductInformation(data);
 
+      // if (items.Count === 1) {
+      //   if (items.Items[0].hasTacc) {
+      //     setTacc(true);
+      //   } else {
+      //     setTacc(false);
+      //   }
+
+      //   setHasProduct({
+      //     name: items.Items[0].name,
+      //     brand: items.Items[0].brand,
+      //     category: items.Items[0].category,
+      //     code: items.Items[0].code
+      //   });
+
+      // }
+
       if (items.Count === 1) {
-        if (items.Items[0].hasTacc) {
-          setTacc(true);
-        } else {
-          setTacc(false);
+        let isProductApt = false;
+        switch (selectedFilter) {
+          case '1': // TACC
+            isProductApt = !items.Items[0].hasTacc;
+            break;
+          case '2': // Vegan
+            isProductApt = !items.Items[0].hasVegan;
+            break;
+          case '3': // Lactose-Free
+            isProductApt = !items.Items[0].hasLactose;
+            break;
+          default:
+            isProductApt = false;
         }
 
         setHasProduct({
           name: items.Items[0].name,
           brand: items.Items[0].brand,
           category: items.Items[0].category,
-          code: items.Items[0].code
+          code: items.Items[0].code,
+          isProductApt
         });
-
       }
 
       setShowResult(true);
@@ -108,26 +135,47 @@ export const Barcode = () => {
     let backgroundColor, icon, text;
 
     if (hasProduct) {
-      if (tacc === true) {
-        backgroundColor = "rgba(255, 0, 0, 0.7)";
-        icon = "✕";
-        text = "Contiene Gluten";
-      } else {
-        backgroundColor = "rgba(0, 255, 0, 0.7)";
-        icon = "✓";
-        text = "Libre de Gluten";
+      // if (tacc === true) {
+      //   backgroundColor = "rgba(255, 0, 0, 0.7)";
+      //   icon = "✕";
+      //   text = "Contiene Gluten";
+      // } else {
+      //   backgroundColor = "rgba(0, 255, 0, 0.7)";
+      //   icon = "✓";
+      //   text = "Libre de Gluten";
+      // }
+      switch (selectedFilter) {
+        case '1': // TACC
+          backgroundColor = hasProduct.isProductApt ? "rgba(0, 255, 0, 0.7)" : "rgba(255, 0, 0, 0.7)";
+          icon = hasProduct.isProductApt ? "✓" : "✕";
+          text = hasProduct.isProductApt ? "Libre de Gluten" : "Contiene Gluten";
+          break;
+        case '2': // Vegan
+          backgroundColor = hasProduct.isProductApt ? "rgba(0, 255, 0, 0.7)" : "rgba(255, 0, 0, 0.7)";
+          icon = hasProduct.isProductApt ? "✓" : "✕";
+          text = hasProduct.isProductApt ? "Apto Vegano" : "No Apto Vegano";
+          break;
+        case '3': // Lactose-Free
+          backgroundColor = hasProduct.isProductApt ? "rgba(0, 255, 0, 0.7)" : "rgba(255, 0, 0, 0.7)";
+          icon = hasProduct.isProductApt ? "✓" : "✕";
+          text = hasProduct.isProductApt ? "Libre de Lactosa" : "Contiene Lactosa";
+          break;
+        default:
+          backgroundColor = "rgba(255, 255, 0, 0.6)";
+          icon = "";
+          text = "No reconocido";
       }
       return (
         <View style={[styles.overlay, { backgroundColor }]}>
-          <Animated.View style={{ 
+          <Animated.View style={{
             transform: [{ translateY }],
-            height: '100%', 
-            width: '100%' 
-            }}>
+            height: '100%',
+            width: '100%'
+          }}>
             {icon && <Text style={styles.overlayIcon}>{icon}</Text>}
             <Text style={styles.overlayText}>{text}</Text>
           </Animated.View>
-          <AnimationComponent hasProduct={hasProduct} hasTacc={tacc} setShowResult={setShowResult} setScanned={setScanned} />
+          <AnimationComponent hasProduct={hasProduct} setShowResult={setShowResult} setScanned={setScanned} />
         </View>
       );
     } else {
@@ -148,7 +196,7 @@ export const Barcode = () => {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={{ height: '100%', width: '100%' }}
       />
-      <FontAwesome5 name="bars" size={35}  onPress={handleAbrirMenu} style={styles.buttonContainer}/>
+      <FontAwesome5 name="bars" size={35} onPress={handleAbrirMenu} style={styles.buttonContainer} />
       {showMenu && <MenuProfile setShowMenu={setShowMenu} />}
       <ResultOverlay />
     </View>

@@ -4,6 +4,7 @@ import { Barcode } from "./components/barcode-component";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { Amplify } from "aws-amplify";
 import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react-native';
+import { FilterProvider } from "./components/context";
 import config from "./src/aws-exports";
 
 Amplify.configure(config);
@@ -28,12 +29,14 @@ const App = () => {
 
 
   return (
-    <View style={styles.barcodebox}>
-      {/* <Pressable onPress={signOut} style={styles.buttonContainer}>
+    <FilterProvider>
+      <View style={styles.barcodebox}>
+        {/* <Pressable onPress={signOut} style={styles.buttonContainer}>
         <Text style={styles.buttonText}>Sign out!</Text>
       </Pressable> */}
-      <Barcode />
-    </View>
+        <Barcode />
+      </View>
+    </FilterProvider>
   );
 };
 

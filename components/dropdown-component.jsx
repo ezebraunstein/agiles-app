@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useFilter } from './context';
 
 const data = [
   { label: 'TACC', value: '1' },
@@ -12,6 +13,7 @@ const data = [
 export const DropdownComponent = () => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+  const { selectedFilter, setSelectedFilter } = useFilter();
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -44,6 +46,7 @@ export const DropdownComponent = () => {
         onBlur={() => setIsFocus(false)}
         onChange={item => {
           setValue(item.value);
+          setSelectedFilter(item.value);
           setIsFocus(false);
         }}
         renderLeftIcon={() => (
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     padding: 5,
-    paddingEnd:1,
+    paddingEnd: 1,
     width: '100%',
   },
   dropdown: {
