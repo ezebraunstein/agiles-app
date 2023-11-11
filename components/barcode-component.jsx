@@ -1,54 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import Constants from "expo-constants";
-import AWS from "aws-sdk";
-import { Text, View, Button, StyleSheet, TouchableWithoutFeedback, Pressable, Animated } from "react-native";
+import { Text, View, StyleSheet, Animated } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AnimationComponent from "./details-component";
 import { MenuProfile } from "./profile-component";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useFilter } from './context';
-
-const { REACT_APP_ACCESS_KEY, REACT_APP_SECRET_ACCESS_KEY } = Constants.expoConfig.extra;
-
-AWS.config.update({
-  region: "us-east-1",
-  accessKeyId: REACT_APP_ACCESS_KEY,
-  secretAccessKey: REACT_APP_SECRET_ACCESS_KEY,
-});
+import AmplifyService from "../services/amplify_service";
 
 export const Barcode = () => {
-
-  const docClient = new AWS.DynamoDB.DocumentClient();
   const [scanned, setScanned] = useState(false);
-  const [tacc, setTacc] = useState(false);
   const [hasProduct, setHasProduct] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const { selectedFilter } = useFilter();
-
-  const fetchProductInformation = async (code) => {
-    return new Promise((resolve, reject) => {
-      const params = {
-        TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
-        FilterExpression: "code = :code",
-        ExpressionAttributeValues: {
-          ":code": code,
-        },
-      };
-
-      docClient.scan(params, (err, items) => {
-        if (err) {
-          console.error(
-            "Unable to scan the table. Error JSON:",
-            JSON.stringify(err, null, 2)
-          );
-          reject(err);
-        } else {
-          resolve(items);
-        }
-      });
-    });
-  };
 
   const handleBarCodeScanned = async ({ type, data }) => {
 
@@ -59,27 +23,11 @@ export const Barcode = () => {
 
     try {
 
-      const items = await fetchProductInformation(data);
-
-      // if (items.Count === 1) {
-      //   if (items.Items[0].hasTacc) {
-      //     setTacc(true);
-      //   } else {
-      //     setTacc(false);
-      //   }
-
-      //   setHasProduct({
-      //     name: items.Items[0].name,
-      //     brand: items.Items[0].brand,
-      //     category: items.Items[0].category,
-      //     code: items.Items[0].code
-      //   });
-
-      // }
+      const items = await AmplifyService.fetchProductInformation(data);
 
       if (items.Count === 1) {
         let isProductApt = false;
-        switch (selectedFilter) {
+        switch (selectedFilter.value) {
           case '1': // TACC
             isProductApt = !items.Items[0].hasTacc;
             break;
@@ -135,16 +83,7 @@ export const Barcode = () => {
     let backgroundColor, icon, text;
 
     if (hasProduct) {
-      // if (tacc === true) {
-      //   backgroundColor = "rgba(255, 0, 0, 0.7)";
-      //   icon = "✕";
-      //   text = "Contiene Gluten";
-      // } else {
-      //   backgroundColor = "rgba(0, 255, 0, 0.7)";
-      //   icon = "✓";
-      //   text = "Libre de Gluten";
-      // }
-      switch (selectedFilter) {
+      switch (selectedFilter.value) {
         case '1': // TACC
           backgroundColor = hasProduct.isProductApt ? "rgba(0, 255, 0, 0.7)" : "rgba(255, 0, 0, 0.7)";
           icon = hasProduct.isProductApt ? "✓" : "✕";

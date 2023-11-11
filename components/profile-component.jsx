@@ -8,9 +8,13 @@ import { DropdownComponent } from './dropdown-component';
 
 const userSelector = (context) => [context.user]
 
-export const MenuProfile = ({setShowMenu}) => {
+export const MenuProfile = ({setShowMenu, setFilter, filter}) => {
     const translateX = useRef(new Animated.Value(200)).current;
     const { user, signOut } = useAuthenticator(userSelector);
+
+    const handleSetFilter = (data) => {
+        setFilter(data)
+    }    
 
     useEffect(() => {
         const animationIn = Animated.timing(translateX, {
@@ -53,7 +57,7 @@ export const MenuProfile = ({setShowMenu}) => {
                         <Text style={styles.$name}>
                             Eze Braunstein
                         </Text>
-                        <DropdownComponent/>
+                        <DropdownComponent setFilter={handleSetFilter} filter={filter}/>
                     </View>
                 </View>
                 {/* Aca el editar perfil */}

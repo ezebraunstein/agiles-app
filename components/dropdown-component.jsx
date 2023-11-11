@@ -3,12 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFilter } from './context';
-
-const data = [
-  { label: 'TACC', value: '1' },
-  { label: 'Vegetariano', value: '2' },
-  { label: 'Sin lactosa', value: '3' },
-];
+import data from '../constants/constants';
 
 export const DropdownComponent = () => {
   const [value, setValue] = useState(null);
@@ -16,7 +11,7 @@ export const DropdownComponent = () => {
   const { selectedFilter, setSelectedFilter } = useFilter();
 
   const renderLabel = () => {
-    if (value || isFocus) {
+    if (selectedFilter || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: 'blue' }]}>
           Filtro busqueda
@@ -41,12 +36,12 @@ export const DropdownComponent = () => {
         valueField="value"
         placeholder={!isFocus ? 'Select item' : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        value={selectedFilter}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
           setValue(item.value);
-          setSelectedFilter(item.value);
+          setSelectedFilter(item);
           setIsFocus(false);
         }}
         renderLeftIcon={() => (
@@ -70,7 +65,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   dropdown: {
-    height: 50,
+    height: 55,
     borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,

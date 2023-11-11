@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { OtherProduct } from './other-product-component';
 import AWS from "aws-sdk";
 import { useFilter } from './context';
+import AmplifyService from "../services/amplify_service";
 
 
 export default function AnimationComponent({ hasProduct, setShowResult, setScanned }) {
@@ -13,58 +14,7 @@ export default function AnimationComponent({ hasProduct, setShowResult, setScann
   const { selectedFilter } = useFilter();
 
   const [arrayProducts, setArrayProducts] = useState([]);
-
-  const fetchProductsInformation = async () => {
-    return new Promise((resolve, reject) => {
-      // const params = {
-      //   TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
-      //   FilterExpression: "category = :category AND hasTacc = :hasTacc AND NOT code = :code",
-      //   ExpressionAttributeValues: {
-      //     ":category": hasProduct.category,
-      //     ":hasTacc": false,
-      //     ":code": hasProduct.code,
-      //   },
-      // };
-      let filterExpression = "category = :category AND NOT code = :code";
-      let expressionAttributeValues = {
-        ":category": hasProduct.category,
-        ":code": hasProduct.code,
-      };
-
-      switch (selectedFilter) {
-        case '1': // TACC
-          filterExpression += " AND hasTacc = :hasTacc";
-          expressionAttributeValues[":hasTacc"] = false;
-          break;
-        case '2': // Vegan
-          filterExpression += " AND hasVegan = :hasVegan";
-          expressionAttributeValues[":hasVegan"] = false;
-          break;
-        case '3': // Lactose-Free
-          filterExpression += " AND hasLactose = :hasLactose";
-          expressionAttributeValues[":hasLactose"] = false;
-          break;
-      }
-
-      const params = {
-        TableName: "Product-qarcfxr6avge5pqqxdgi75roxi-staging",
-        FilterExpression: filterExpression,
-        ExpressionAttributeValues: expressionAttributeValues,
-      };
-
-      docClient.scan(params, (err, items) => {
-        if (err) {
-          console.error(
-            "Unable to scan the table. Error JSON:",
-            JSON.stringify(err, null, 2)
-          );
-          reject(err);
-        } else {
-          resolve(items);
-        }
-      });
-    });
-  };
+  
 
   useEffect(() => {
     const animationIn = Animated.timing(translateY, {
@@ -92,7 +42,7 @@ export default function AnimationComponent({ hasProduct, setShowResult, setScann
   async function showOtherProducts() {
     setHeight('80%')
     translateY.setValue(250)
-    const products = await fetchProductsInformation();
+    const products = await AmplifyService.fetchEqualProductsInformation(hasProduct, selectedFilter);
     setArrayProducts(products.Items)
     Animated.timing(translateY, {
       toValue: 0,
