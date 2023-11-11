@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: 'black',
     position: 'absolute',
-    backgroundColor: '#fff',
     top: 80,
     right: 30
   },
