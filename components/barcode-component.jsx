@@ -169,9 +169,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonContainer: {
-    alignSelf: 'center',
+    textAlign: 'center',
     color: 'white',
     position: 'absolute',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
+    width: 40,
     top: 80,
     right: 30
   },
