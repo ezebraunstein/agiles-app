@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignSelf: 'center',
-    color: 'black',
+    color: 'white',
     position: 'absolute',
     top: 80,
     right: 30
